@@ -1,19 +1,19 @@
 
-## Info 299:  Production-Grade LLMs and Software Engineering Practicum
-**Course Code:** INFO298 Directed Group Study
-**Credits:** 3 Units  
-**Term:** Spring 2025  
-**Instructor of Record/Advisor:** Prof. Niloufar Salehi
-**Course Participants**: Anagha Ananth, Arnur Sabet
-**Method of Instruction**: Online Lectures, Readings, Discussions and Labs
-**Grading Basis**: S/U
-**Grading Breakdown Summary**
-- Weekly Progress Reports: 10%
-- Literature Survey: 10%
-- High-Level System Diagram: 15%
-- Low-Level Design Diagram: 15%
-- Implementation of the Application: 40%
-- Documentation & Final Report: 10%
+## Info 298:  Production-Grade LLMs and Software Engineering Practicum
+- **Course Code:** INFO298 Directed Group Study  
+- **Credits:** 3 Units  
+- **Term:** Spring 2025  
+- **Instructor of Record/Advisor:** Prof. Niloufar Salehi 
+- **Course Participants**: Anagha Ananth, Arnur Sabet 
+- **Method of Instruction**: Online Lectures, Readings, Discussions and Labs 
+- **Grading Basis**: S/U 
+- **Grading Breakdown Summary**
+    - Weekly Progress Reports: 10%
+    - Literature Survey: 10%
+    - High-Level System Diagram: 15%
+    - Low-Level Design Diagram: 15%
+    - Implementation of the Application: 40%
+    - Documentation & Final Report: 10%
 ---
 
 ### **Course Description**
@@ -104,15 +104,15 @@ By the end of this course, we will:
 
 This syllabus provides a structured approach to building an impactful application that integrates cutting-edge AI technologies while addressing critical ethical and regulatory concerns.
 
-### References:
-[1] https://internationaloffice.berkeley.edu/students/academics/uc-berkeley-academic-systems-and-norms
-[2] https://www.nature.com/articles/s41746-025-01429-0
-[3] https://llmagents-learning.org/f24
-[4] https://teaching.berkeley.edu/sites/default/files/syllabus-template-2023.docx
-[5] https://www.moriskyscale.com/blog/maintaining-hipaa-compliance-in-healthcare-developing-an-internal-llm-for-data-privacy
-[6] https://www.gilesthomas.com/2024/12/llm-from-scratch-3
-[7] https://academic-senate.berkeley.edu/coci-handbook/2.3.1
-[8] https://www.datavant.com/hipaa-privacy/patient-privacy-in-the-age-of-large-language-models
+### References (Work In Progress):
+[1] https://internationaloffice.berkeley.edu/students/academics/uc-berkeley-academic-systems-and-norms  
+[2] https://www.nature.com/articles/s41746-025-01429-0  
+[3] https://llmagents-learning.org/f24  
+[4] https://teaching.berkeley.edu/sites/default/files/syllabus-template-2023.docx  
+[5] https://www.moriskyscale.com/blog/maintaining-hipaa-compliance-in-healthcare-developing-an-internal-llm-for-data-privacy  
+[6] https://www.gilesthomas.com/2024/12/llm-from-scratch-3  
+[7] https://academic-senate.berkeley.edu/coci-handbook/2.3.1  
+[8] https://www.datavant.com/hipaa-privacy/patient-privacy-in-the-age-of-large-language-models  
 [9] https://data6.org/su21/syllabus/
 
 ---
