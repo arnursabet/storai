@@ -1,166 +1,67 @@
-# StorAI - A Clinical AI Assistant (WIP)
+# StorAI - HIPAA-Compliant Clinical Notes Summarizer
 
-A modern web application for managing and processing clinical sessions, featuring audio transcription, clinical summary generation, and EHR integration. This is a work in progress and is not yet ready for production.
+StorAI is a desktop application built with Tauri and React that helps therapists generate narrative summaries from clinical notes using local LLM processing.
 
-## Architecture Overview
+## Setup and Installation
 
-The application follows Clean Architecture principles with Domain-Driven Design (DDD), organized into the following layers:
+### Prerequisites
 
-### 1. Domain Layer (`src/domain/`)
-- Contains the core business logic and interfaces
-- Independent of external frameworks and services
-- Key components:
-  - `entities/`: Core business objects (ClinicalSession, ClinicalSummary)
-  - `interfaces/`: Core service interfaces (TranscriptionService, LLMInterface)
-  - `repositories/`: Data access interfaces
-  - `validators/`: Data validation schemas
+- Node.js (v18 or later)
+- Rust (for Tauri development)
+- LLM model file (optional, see the "LLM Model Setup" section below)
 
-### 2. Application Layer (`src/application/`)
-- Contains use cases and orchestration logic
-- Implements business workflows
-- Key components:
-  - `use-cases/`: Business operations (GenerateClinicalSummary)
-  - `services/`: Application services (SessionManager)
+### Installation Steps
 
-### 3. Infrastructure Layer (`src/infrastructure/`)
-- Implements interfaces defined in the domain layer
-- Handles external service integration
-- Key components:
-  - `transcription/`: Whisper API integration
-  - `llm/`: OpenAI integration for summary generation
-  - `ehr/`: EHR system integration
-  - `db/`: Database implementations
-  - `policy/`: Ethics policy implementations
-  - `di-container.ts`: Dependency injection configuration
+1. Clone the repository:
+   ```
+   git clone https://github.com/yourusername/storai.git
+   cd storai
+   ```
 
-### 4. Presentation Layer (`src/presentation/ & app/`)
-- Next.js application with API routes and React components
-- Handles HTTP requests and UI rendering
-- Key components:
-  - `app/`: Next.js pages and API routes
-  - `src/presentation/`: Reusable components and controllers
-
-## Key Features
-
-1. Audio Transcription
-   - Supports multiple audio formats (mp3, m4a, wav, flac, ogg)
-   - Uses OpenAI's Whisper API
-   - Handles file uploads and processing
-
-2. Clinical Summary Generation
-   - AI-powered summary generation
-   - Ethics policy validation
-   - Integration with EHR systems
-
-## Dependencies
-
-- Node.js (v18.16.1)
-- Next.js
-- TypeScript
-- InversifyJS (Dependency Injection)
-- OpenAI API
-- Form-data
-- node-fetch
-
-## Getting Started
-
-1. Clone the repository
 2. Install dependencies:
-   ```bash
+   ```
    npm install
    ```
-3. Set up environment variables:
-   ```
-   WHISPER_API_KEY=your_openai_api_key
-   OPENAI_API_KEY=your_openai_api_key
-   ```
-4. Run the development server:
-   ```bash
-   npm run dev
-   ```
 
-## Contributing
+### Running the App
 
-### Development Workflow
+#### Desktop Mode (Tauri)
 
-1. Create a new branch for your feature/fix:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. Follow the existing architecture:
-   - Place business logic in appropriate layers
-   - Use dependency injection
-   - Implement interfaces for new services
-   - Add necessary tests
-
-3. Code Style Guidelines:
-   - Use TypeScript
-   - Follow SOLID principles
-   - Document public APIs
-   - Use meaningful variable/function names
-
-4. Testing:
-   - Write unit tests for domain logic
-   - Write integration tests for infrastructure services
-   - Test API endpoints
-
-### Adding New Features
-
-1. Domain Changes:
-   - Add new entities in `src/domain/entities/`
-   - Define interfaces in `src/domain/interfaces/`
-   - Create validators in `src/domain/validators/`
-
-2. Infrastructure Implementation:
-   - Implement new interfaces in `src/infrastructure/`
-   - Register services in `di-container.ts`
-   - Add necessary environment variables
-
-3. API Endpoints:
-   - Create new routes in `app/api/`
-   - Use dependency injection for services
-   - Handle errors appropriately
-
-4. UI Components:
-   - Add new pages in `app/`
-   - Create reusable components in `src/presentation/components/`
-
-## Project Structure
-
+To run the app in development mode:
 ```
-├── app/                    # Next.js pages and API routes
-│   ├── api/               # API endpoints
-│   └── */                 # Page components
-├── src/
-│   ├── domain/           # Core business logic
-│   ├── application/      # Use cases and services
-│   ├── infrastructure/   # External service implementations
-│   └── presentation/     # UI components and controllers
-├── tests/                # Test files
-└── package.json         # Project dependencies
+npm run tauri dev
 ```
 
-## Environment Variables
+To build for production:
+```
+npm run tauri build
+```
 
-Required environment variables:
-- `WHISPER_API_KEY`: OpenAI API key for transcription
-- `OPENAI_API_KEY`: OpenAI API key for summary generation
+#### Web Mode (Browser)
 
-## Common Issues and Solutions
+To run the app in web mode:
+```
+npm run dev:web
+```
 
-1. File Upload Issues:
-   - Ensure correct file format
-   - Check file size limits
-   - Verify FormData structure
+To build for web:
+```
+npm run build:web
+```
 
-2. API Integration:
-   - Verify API keys
-   - Check request format
-   - Monitor rate limits
+### LLM Model Setup (Optional)
 
-## Additional Resources
+StorAI can utilize a local LLM model to generate summaries, but this setup is optional:
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [OpenAI API Documentation](https://platform.openai.com/docs)
-- [Clean Architecture Guide](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+1. Download the Llama 2 7B model in GGUF format from [HuggingFace](https://huggingface.co/models)
+2. Create a `models` directory in the app's data directory:
+   - Windows: `%APPDATA%/com.storai.app/models/`
+   - macOS: `~/Library/Application Support/com.storai.app/models/`
+   - Linux: `~/.local/share/com.storai.app/models/`
+3. Place the model file in this directory and rename it to `llama-2-7b-chat.gguf`
+
+If you choose not to set up a local LLM, the application will still function with limited summarization capabilities.
+
+
+
+
