@@ -1,0 +1,17 @@
+:root {
+  /* Storai color palette */
+  --color-storai-aquamarine: #7FFFD6;
+  --color-storai-mint: #03FAC5;
+  --color-storai-jade: #00CC9C;
+  --color-storai-cadet: #5F9F9E;
+  --color-storai-teal: #009293;
+  --color-storai-turquoise: #008080;
+  --color-storai-sky: #C9EDEF;
+  --color-storai-seafoam: #BEF3EA;
+  --color-storai-azure: #B3F0F9;
+  --color-storai-blue: #2388FF;
+  --color-storai-border: #E3E6EA;
+  --color-storai-dark-blue: #19213D;
+  --color-storai-gray: #666F8D;
+  --color-storai-light-gray: #F7F8FA;
+} 
