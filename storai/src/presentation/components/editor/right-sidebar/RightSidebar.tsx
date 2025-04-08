@@ -2,6 +2,7 @@ import React, { RefObject } from 'react';
 import StorAI_Logo from '../../../../assets/logo.png';
 import UploadsSection from './components/UploadsSection';
 import TemplatesSection from './components/TemplatesSection';
+import ArrowButton from '../../common/ArrowButton';
 
 interface RightSidebarProps {
   // Toggle UI states
@@ -33,7 +34,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   uploadedFiles,
 }) => {
   return (
-    <div className="w-64 bg-white flex flex-col ml-6 shadow-lg mt-3 mb-3 border border-gray-100 rounded-[10px]">
+    <div className="w-[372px] bg-white flex flex-col ml-3 mr-3 shadow-lg mt-3 mb-3 border border-gray-100 rounded-[10px]">
       
         {/* StorAI Section */}
         <div className="p-4 flex items-center">
@@ -45,40 +46,37 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
             </div>
         </div>
 
-        {/* Uploads Section */}
-        <UploadsSection 
-            uploadsExpanded={uploadsExpanded}
-            toggleUploads={toggleUploads}
-            fileInputRef={fileInputRef}
-            handleFileInputChange={handleFileInputChange}
-            directUploading={directUploading}
-            directUploadProgress={directUploadProgress}
-            directUploadError={directUploadError}
-            uploadedFiles={uploadedFiles}
-        />
-    
+        <div className="p-4 flex flex-col gap-4">
+          {/* Uploads Section */}
 
-        {/* Template Section */}
-        <TemplatesSection
-            templateExpanded={templateExpanded}
-            toggleTemplates={toggleTemplates}
-        />
+          <UploadsSection 
+              uploadsExpanded={uploadsExpanded}
+              toggleUploads={toggleUploads}
+              fileInputRef={fileInputRef}
+              handleFileInputChange={handleFileInputChange}
+              directUploading={directUploading}
+              directUploadProgress={directUploadProgress}
+              directUploadError={directUploadError}
+              uploadedFiles={uploadedFiles}
+          />
+      
 
+          {/* Template Section */}
+          <TemplatesSection
+              templateExpanded={templateExpanded}
+              toggleTemplates={toggleTemplates}
+          />
+        </div>
         {/* Links */}
-        <div className="p-4 space-y-4">
-            <a href="#" className="flex items-center justify-between text-storai-teal font-medium">
-                <span>FAQ</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                 </svg>
-            </a>
+
+        <div className="p-8 space-y-6">
+          <ArrowButton
+            text="FAQ"
+          />
             
-            <a href="#" className="flex items-center justify-between text-storai-teal font-medium">
-                <span>HIPAA Compliance</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-            </a>
+          <ArrowButton
+            text="HIPAA Compliance"
+          />
         </div>
     </div>
   );

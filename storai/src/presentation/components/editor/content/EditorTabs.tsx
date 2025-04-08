@@ -16,13 +16,13 @@ const EditorTabs: React.FC = () => {
         handleTabRename(tabId, newName);
         setEditingTabId(null);
     };
-  
+
     return (
         <div className="flex bg-[--color-storai-light-gray]">
             {tabs.map(tab => (
                 <div
                     key={tab.id} 
-                    className={`flex items-center px-4 py-2 border-r border-gray-200 cursor-pointer ${activeTabId === tab.id ? 'bg-white border-b-2 border-b-storai-teal' : 'bg-[--color-storai-light-gray] hover:bg-gray-100'}`}
+                    className={`flex items-center px-4 py-2 cursor-pointer ${activeTabId === tab.id ? 'bg-white border-t border-gray-200 rounded-t-[8px] shadow-[rgba(0, 0, 0, 0.1)_1px_-2px_5px_0px]' : 'bg-[--color-storai-light-gray] hover:bg-gray-100'}`}
                     onClick={() => handleTabClick(tab.id)}
                 >
                     {editingTabId === tab.id ? (

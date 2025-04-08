@@ -3,6 +3,44 @@ import { formatFileSize } from '../../utils/textFormatting';
 import { FileServiceFactory } from '../../../../../infrastructure/storage/FileServiceFactory';
 import { textToSlateValue } from '../../utils/textFormatting';
 import { useEditorContext } from '../../context/EditorContext';
+import { FileIcon, OptionsIcon, ArrowIcon, AddIcon, ProgressBar } from '../../../common';
+import { useFileOpener } from '../../hooks/useFileOpener';
+
+interface FileItemProps {
+  file: any; // Replace with proper type
+  onOpen: (file: any) => void;
+}
+
+const FileItem: React.FC<FileItemProps> = ({ file, onOpen }) => {
+  return (
+    <div className="p-3 mb-3 flex items-center justify-between bg-white border border-gray-200 rounded-[8px]">
+      <div className="flex items-center">
+        <FileIcon />
+        <div className="w-full flex flex-row items-center justify-between">
+          <div className="text-sm text-gray-700">
+            {file.name}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <div className="text-xs text-gray-500 lowercase">
+          {formatFileSize(file.size)}
+        </div>
+        <button 
+          className="text-gray-400 hover:text-gray-600"
+          aria-label={`Open ${file.name}`}
+          title={`Open ${file.name}`}
+          onClick={() => onOpen(file)}
+        >
+          <OptionsIcon />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+
 
 interface UploadsSectionProps {
   uploadsExpanded: boolean;
@@ -14,6 +52,111 @@ interface UploadsSectionProps {
   directUploadError: string | null;
   uploadedFiles: any[]; // Using 'any' for now, replace with proper type
 }
+
+// const UploadsSection: React.FC<UploadsSectionProps> = ({
+//   uploadsExpanded,
+//   toggleUploads,
+//   fileInputRef,
+//   handleFileInputChange,
+//   directUploading,
+//   directUploadProgress,
+//   directUploadError,
+//   uploadedFiles
+// }) => {
+//   const { openFile } = useFileOpener();
+
+//   // Helper component for the section header
+//   const SectionHeader = () => (
+//     <div 
+//       className={`p-4 flex items-center cursor-pointer ${uploadsExpanded ? 'bg-[--color-storai-light-gray] rounded-t-[8px]' : ''}`}
+//       onClick={toggleUploads}
+//     >   
+//       <div className="w-full flex items-center justify-between">
+//         <span className={`font-medium ${uploadsExpanded ? 'text-[--color-storai-blue]' : 'text-[--color-storai-gray]'}`}>
+//           Uploads
+//         </span>
+//         <ArrowIcon expanded={uploadsExpanded} />
+//       </div>
+//     </div>
+//   );
+
+//   // Helper component for upload progress
+//   const UploadProgress = () => (
+//     directUploading && (
+//       <div className="mb-3 bg-blue-50 p-3 rounded-md">
+//         <p className="text-sm text-blue-700 mb-1">
+//           Uploading files...
+//         </p>
+//         <ProgressBar progress={Object.values(directUploadProgress)[0] || 0} />
+//       </div>
+//     )
+//   );
+
+//   // Helper component for upload error
+//   const UploadError = () => (
+//     directUploadError && (
+//       <div className="mb-3 bg-red-50 p-3 rounded-md text-sm text-red-700">
+//         {directUploadError}
+//       </div>
+//     )
+//   );
+
+//   // Helper component for file list
+//   const FileList = () => (
+//     uploadedFiles.length > 0 ? (
+//       <div className="mb-3">
+//         {uploadedFiles.map(file => (
+//           <FileItem 
+//             key={file.id} 
+//             file={file} 
+//             onOpen={openFile} 
+//           />
+//         ))}
+//       </div>
+//     ) : (
+//       <p className="text-sm text-gray-500 mb-3">No files uploaded yet</p>
+//     )
+//   );
+
+//   // Helper component for upload button
+//   const UploadButton = () => (
+//     <button 
+//       className="m-auto mt-3 bg-storai-teal text-white rounded-[10px] py-2 px-4 flex items-center justify-center hover:bg-storai-teal transition-colors shadow-md text-sm"
+//       onClick={() => fileInputRef.current?.click()}
+//       disabled={directUploading}
+//     >
+//       <AddIcon />
+//       {directUploading ? 'Uploading...' : `Upload`}
+//     </button>
+//   );
+
+//   return (
+//     <div className="border-b border-gray-100">
+//       <SectionHeader />
+      
+//       {uploadsExpanded && (
+//         <div className="p-4 pt-0 bg-[--color-storai-light-gray] rounded-b-[8px]">
+//           {/* Hidden file input */}
+//           <input 
+//             type="file" 
+//             ref={fileInputRef} 
+//             className="hidden" 
+//             onChange={handleFileInputChange} 
+//             multiple
+//             aria-label="File upload"
+//           />
+          
+//           <UploadProgress />
+//           <UploadError />
+//           <FileList />
+//           <UploadButton />
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default React.memo(UploadsSection);
 
 const UploadsSection: React.FC<UploadsSectionProps> = ({
   uploadsExpanded,
@@ -39,22 +182,21 @@ const UploadsSection: React.FC<UploadsSectionProps> = ({
   return (
     <div className="border-b border-gray-100">
         <div 
-            className="p-4 flex items-center justify-between cursor-pointer"
+            className={`p-4 flex items-center cursor-pointer ${uploadsExpanded ? 'bg-[--color-storai-light-gray] rounded-t-[8px]' : ''}`}
             onClick={toggleUploads}
-        >
-            <span className="text-storai-teal font-medium">Uploads</span>
-            <svg 
-                className={`h-5 w-5 text-gray-400 transition-transform ${uploadsExpanded ? 'transform rotate-180' : ''}`}
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
-            >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
+        >   
+            <div className="w-full flex items-center justify-between">
+                <span className={`font-medium ${uploadsExpanded ? 'text-[--color-storai-blue]' : 'text-[--color-storai-gray]'}`}>Uploads</span>
+                <svg 
+                    className={`transition-transform ${uploadsExpanded ? 'transform rotate-[-90deg]' : ''}`}
+                    width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.03786 15.5L12.9609 10L7.03786 4.5" stroke={uploadsExpanded ? 'var(--color-storai-blue)' : 'var(--color-storai-gray)'} stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
         </div>
       
         {uploadsExpanded && (
-            <div className="p-4 pt-0">
+            <div className="p-4 pt-0 bg-[--color-storai-light-gray] rounded-b-[8px]">
                 {/* Hidden file input */}
                 <input 
                     type="file" 
@@ -90,29 +232,30 @@ const UploadsSection: React.FC<UploadsSectionProps> = ({
                 {/* Uploaded files list */}
                 {uploadedFiles.length > 0 ? (
                     <div className="mb-3">
-                        <p className="text-xs text-gray-500 mb-2">
-                            Uploaded files:
-                        </p>
                         {uploadedFiles.map(file => (
-                            <div key={file.id} className="flex items-center justify-between mb-3">
+                            <div key={file.id} className="p-3 mb-3 flex items-center justify-between bg-white border border-gray-200 rounded-[8px]">
                                 <div className="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    <svg className="mr-2" width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <rect width="32" height="32" rx="5.33333" fill="#F6FAFF"/>
+                                        <path fill-rule="evenodd" clip-rule="evenodd" d="M22.4005 13.8513C22.4005 13.5576 22.2838 13.276 22.0762 13.0684L17.3321 8.32429C17.1245 8.11665 16.8429 8 16.5492 8H10.431C9.97237 8 9.60059 8.37178 9.60059 8.8304V23.1696C9.60059 23.6282 9.97237 24 10.431 24H21.5701C22.0287 24 22.4005 23.6282 22.4005 23.1696V13.8513ZM16.3911 9.48797C16.3563 9.4531 16.2966 9.4778 16.2966 9.52712V13.9355C16.2966 14.0578 16.3958 14.1569 16.5181 14.1569H20.9265C20.9758 14.1569 21.0005 14.0973 20.9656 14.0624L16.3911 9.48797Z" fill="#2388FF"/>
                                     </svg>
-                                    <div>
+
+                                    <div className="w-full flex flex-row items-center justify-between">
                                         <div className="text-sm text-gray-700">
                                             {file.name}
                                         </div>
-                                        <div className="text-xs text-gray-500">
-                                            {formatFileSize(file.size)}
-                                        </div>
                                     </div>
                                 </div>
-                                <button 
-                                    className="text-gray-400 hover:text-gray-600"
-                                    aria-label={`Open ${file.name}`}
-                                    title={`Open ${file.name}`}
-                                    onClick={() => {
+
+                                <div className="flex items-center gap-2">
+                                    <div className="text-xs text-gray-500 lowercase">
+                                        {formatFileSize(file.size)}
+                                    </div>
+                                    <button 
+                                        className="text-gray-400 hover:text-gray-600"
+                                        aria-label={`Open ${file.name}`}
+                                        title={`Open ${file.name}`}
+                                        onClick={() => {
                                         // Open this file in the editor
                                         const openInEditor = async () => {
                                             try {
@@ -185,11 +328,17 @@ const UploadsSection: React.FC<UploadsSectionProps> = ({
                                         openInEditor();
                                     }}
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                    </svg>
-                                </button>
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M7.0005 2.06057C6.81337 2.06057 6.6339 1.98623 6.50158 1.85391C6.36926 1.72159 6.29492 1.54212 6.29492 1.35499C6.29492 1.16786 6.36926 0.988394 6.50158 0.856073C6.6339 0.723751 6.81337 0.649414 7.0005 0.649414" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.00098 2.06057C7.18811 2.06057 7.36757 1.98623 7.49989 1.85391C7.63222 1.72159 7.70655 1.54212 7.70655 1.35499C7.70655 1.16786 7.63222 0.988394 7.49989 0.856073C7.36757 0.723751 7.18811 0.649414 7.00098 0.649414" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.0005 13.3496C6.81337 13.3496 6.6339 13.2753 6.50158 13.143C6.36926 13.0106 6.29492 12.8312 6.29492 12.6441C6.29492 12.4569 6.36926 12.2775 6.50158 12.1451C6.6339 12.0128 6.81337 11.9385 7.0005 11.9385" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.00098 13.3496C7.18811 13.3496 7.36757 13.2753 7.49989 13.143C7.63222 13.0106 7.70655 12.8312 7.70655 12.6441C7.70655 12.4569 7.63222 12.2775 7.49989 12.1451C7.36757 12.0128 7.18811 11.9385 7.00098 11.9385" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.0005 7.7051C6.81337 7.7051 6.6339 7.63076 6.50158 7.49844C6.36926 7.36612 6.29492 7.18665 6.29492 6.99952C6.29492 6.81239 6.36926 6.63293 6.50158 6.5006C6.6339 6.36828 6.81337 6.29395 7.0005 6.29395" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.00098 7.7051C7.18811 7.7051 7.36757 7.63076 7.49989 7.49844C7.63222 7.36612 7.70655 7.18665 7.70655 6.99952C7.70655 6.81239 7.63222 6.63293 7.49989 6.5006C7.36757 6.36828 7.18811 6.29395 7.00098 6.29395" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
@@ -198,14 +347,15 @@ const UploadsSection: React.FC<UploadsSectionProps> = ({
                 )}
           
                 <button 
-                    className="w-full mt-3 bg-storai-teal text-white rounded-md py-2 px-4 flex items-center justify-center hover:bg-storai-teal transition-colors"
+                    className="m-auto mt-3 bg-storai-teal text-white rounded-[10px] py-2 px-4 flex items-center justify-center hover:bg-storai-teal transition-colors shadow-md text-sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={directUploading}
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    <svg className="h-4 w-4 mr-1" width="12" height="12" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6.5 1.5V10.5M11 6H2" stroke="white" stroke-linecap="round" stroke-linejoin="round"/>
                     </svg>
-                    {directUploading ? 'Uploading...' : `Upload to ${activeFolder?.name}`}
+
+                    {directUploading ? 'Uploading...' : `Upload`}
                 </button>
             </div>
         )}

@@ -82,7 +82,7 @@ export class OpenAIService implements ILLMService {
   private createSystemPrompt(templateType: TemplateType): string {
     const basePrompt = `You are a professional medical note writer. Analyze the patient notes and create a well-formatted ${templateType} note.
 Format your response with clear sections and structure.
-Present each section header on its own line with a colon at the end (e.g., "Subjective:").
+Present each section header on its own line with a colon at the end.
 Do not provide any additional explanations, comments, or analysis outside the template itself.
 Use only information present in the original notes.`;
     

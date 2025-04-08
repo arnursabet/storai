@@ -17,22 +17,11 @@ export const ArrowButton: React.FC<ArrowButtonProps> = ({
       onClick={onClick}
       className={`w-full flex items-center justify-between text-left border-none bg-transparent text-storai-teal py-2 shadow-[0_1px_0_rgba(0,0,0,0.05)] cursor-pointer transition-colors hover:text-storai-turquoise ${className}`}
     >
-      <span className="text-[0.875rem] font-medium">{text}</span>
-      <svg 
-        xmlns="http://www.w3.org/2000/svg" 
-        width="24" 
-        height="24" 
-        viewBox="0 0 24 24" 
-        fill="none" 
-        stroke="currentColor" 
-        strokeWidth="2" 
-        strokeLinecap="round" 
-        strokeLinejoin="round" 
-        className="text-gray-400 transform rotate-[-45deg]"
-      >
-        <path d="M5 12h14"></path>
-        <path d="M12 5l7 7-7 7"></path>
-      </svg>
+      <span className="text-[0.875rem] font-bold">{text}</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3.78241 2.52898L9.60588 2.39355L9.47045 8.21702M9.38803 2.51616L2.3457 9.55849" stroke="#666F8D" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+
     </button>
   );
 };
