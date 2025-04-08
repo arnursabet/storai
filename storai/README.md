@@ -15,7 +15,7 @@ StorAI is a desktop application built with Tauri and React that helps therapists
 1. Clone the repository:
    ```
    git clone https://github.com/arnursabet/storai.git
-   cd storai
+   cd storai/storai
    ```
 
 2. Install dependencies:
@@ -25,28 +25,11 @@ StorAI is a desktop application built with Tauri and React that helps therapists
 
 ### Running the App
 
-#### Desktop Mode (Tauri)
-
-To run the app in development mode:
-```
-npm run tauri dev
-```
-
-To build for production:
-```
-npm run tauri build
-```
-
 #### Web Mode (Browser)
 
 To run the app in web mode:
 ```
 npm run dev:web
-```
-
-To build for web:
-```
-npm run build:web
 ```
 
 ### LLM Model Setup (Optional)

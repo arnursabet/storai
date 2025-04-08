@@ -4,18 +4,9 @@ import { useFileUpload } from '../../../application/hooks/useFileUpload';
 import { FileService } from '../../../infrastructure/storage/FileService';
 import { DocumentIcon } from '../icons/DocumentIcon';
 import ArrowButton from '../common/ArrowButton';
-import { useEditorContext } from '../editor/context/EditorContext';
-import { EditorProvider } from '../editor/context/EditorContext';
-
-// Default folder ID for initial uploads
-const DEFAULT_FOLDER_ID = '1';
 
 export const UploadScreen: React.FC = () => {
-  return (
-    <EditorProvider>
-      <UploadScreenContent />
-    </EditorProvider>
-  );
+  return <UploadScreenContent />;
 };
 
 /**
@@ -31,7 +22,6 @@ export function UploadScreenContent() {
     uploadError,
     addFiles,
     removeFile,
-    uploadFiles,
     uploadedFiles,
     fetchUploadedFiles
   } = useFileUpload();
@@ -39,23 +29,9 @@ export function UploadScreenContent() {
   const [dragActive, setDragActive] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
   
-  // Direct upload state
   const [directUploading, setDirectUploading] = useState(false);
   const [directUploadProgress, setDirectUploadProgress] = useState<{ [key: string]: number }>({});
   const [directUploadError, setDirectUploadError] = useState<string | null>(null);
-
-  const { associateFileWithFolder } = useEditorContext();
-
-  // Monitor uploadedFiles changes and navigate when files are uploaded
-  useEffect(() => {
-    if (uploadedFiles.length > 0 && !isUploading && !directUploading) {
-      // Store folder ID in localStorage for EditorScreen to use
-      localStorage.setItem('defaultFolderId', DEFAULT_FOLDER_ID);
-      
-      // Navigate to templates page when upload is complete
-      navigate('/templates');
-    }
-  }, [uploadedFiles, isUploading, directUploading, navigate]);
 
   /**
    * Handles files dropped into the drag area
@@ -67,72 +43,69 @@ export function UploadScreenContent() {
     setDragActive(false);
     
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      addFiles(Array.from(e.dataTransfer.files));
       await directUploadFiles(Array.from(e.dataTransfer.files));
     }
   };
 
   /**
-   * Direct upload files without relying on state updates
+   * Directly uploads an array of files using FileService.
    */
   const directUploadFiles = async (filesToUpload: File[]) => {
     if (filesToUpload.length === 0) return;
     
     setDirectUploading(true);
     setDirectUploadError(null);
+    setDirectUploadProgress({});
     
+    let allSuccessful = true;
+
     try {
-      // Upload files directly using the FileService
       for (const file of filesToUpload) {
-        // Create progress simulation
+        setDirectUploadProgress(prev => ({ ...prev, [file.name]: 0 }));
+
         const progressInterval = setInterval(() => {
           setDirectUploadProgress(prev => {
             const currentProgress = prev[file.name] || 0;
-            if (currentProgress < 90) {
-              return {
-                ...prev,
-                [file.name]: currentProgress + 10
-              };
-            }
-            return prev;
+            return { ...prev, [file.name]: Math.min(currentProgress + 10, 90) }; 
           });
-        }, 300);
+        }, 200);
         
         try {
-          // Direct upload through FileService
-          // Associate file with default folder (Folder 1)
-          const uploadedFile = await FileService.uploadFile(file);
+          await FileService.uploadFile(file);
           
-          // Store the file-folder association in context instead of localStorage
-          associateFileWithFolder(uploadedFile.id, DEFAULT_FOLDER_ID);
-          
-          // Set progress to 100%
-          setDirectUploadProgress(prev => ({
-            ...prev,
-            [file.name]: 100
-          }));
+          setDirectUploadProgress(prev => ({ ...prev, [file.name]: 100 }));
+
         } catch (error) {
+          allSuccessful = false;
           console.error(`Error uploading file ${file.name}:`, error);
-          setDirectUploadError(`Error uploading file ${file.name}: ${error instanceof Error ? error.message : String(error)}`);
+          setDirectUploadError(prevError => 
+             `${prevError ? prevError + "; " : ""}Error uploading ${file.name}: ${error instanceof Error ? error.message : String(error)}`
+          );
+          setDirectUploadProgress(prev => {
+              const { [file.name]: _, ...rest } = prev;
+              return rest;
+          });
         } finally {
           clearInterval(progressInterval);
         }
       }
       
-      // Store information about the upload in localStorage
-      localStorage.setItem('uploadedToFolder', DEFAULT_FOLDER_ID);
-      
-      // After uploading, refresh the list of uploaded files
       await fetchUploadedFiles();
+
+      console.log("Navigating to /templates after upload attempt.");
+      navigate('/templates'); 
+
     } catch (error) {
-      console.error('Error in upload process:', error);
-      setDirectUploadError(`Upload failed: ${error instanceof Error ? error.message : String(error)}`);
+      console.error('Error in the overall upload process:', error);
+      setDirectUploadError(`Upload process failed: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setDirectUploading(false);
     }
   };
 
   /**
-   * Handles drag over event for visual feedback
+   * Handles drag over event
    */
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -141,48 +114,45 @@ export function UploadScreenContent() {
   };
 
   /**
-   * Handles drag leave event for visual feedback
+   * Handles drag leave event
    */
   const handleDragLeave = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return; 
     setDragActive(false);
   };
 
   /**
-   * Triggers the hidden file input when the button is clicked
+   * Triggers the hidden file input
    */
   const handleButtonClick = () => {
     fileInputRef.current?.click();
   };
 
   /**
-   * Handles files selected through the file input
+   * Handles files selected via input, adds them to stage, and uploads.
    */
   const handleFileInputChange = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFiles = Array.from(e.target.files);
-      
-      // Use the direct upload method
+      addFiles(selectedFiles);
       await directUploadFiles(selectedFiles);
-      
-      // Reset the input value to allow selecting the same file again
       e.target.value = '';
     }
   };
 
   /**
-   * Handles the file upload submission
+   * Handles form submission (used if files are staged but not uploaded immediately).
+   * Currently, uploads happen immediately on select/drop.
    */
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (files.length > 0) {
-      await directUploadFiles(files);
-    }
+    console.log("Form submitted, files should already be uploading/uploaded.");
   };
 
   /**
-   * Format file size for display
+   * Format file size
    */
   const formatFileSize = (bytes: number): string => {
     if (bytes < 1024) return bytes + ' bytes';
@@ -191,26 +161,22 @@ export function UploadScreenContent() {
   };
 
   /**
-   * Toggle data policy visibility
+   * Toggle data policy
    */
   const toggleDataPolicy = () => {
     setShowPolicy(!showPolicy);
   };
 
   /**
-   * Navigate to editor when skip is clicked
+   * Navigate to editor (Skip button)
    */
   const handleSkip = () => {
-    // Clear any template-related localStorage items to prevent automatic template generation
-    localStorage.removeItem('selectedTemplate');
-    localStorage.removeItem('pendingTemplateGeneration');
-    
-    // Navigate to editor without uploading any files
+    console.log("Skipping upload, navigating to /editor");
     navigate('/editor');
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-3">
+    <div className="min-h-screen flex flex-col items-center justify-center p-3 bg-gray-50">
       <div className="w-full max-w-[50rem] mx-auto p-8 bg-white rounded-xl shadow-lg relative">
         <h1 className="text-[1.875rem] text-[var(--color-storai-dark-blue)] mb-2">Upload files</h1>
         <p className="text-[var(--color-storai-gray)] text-[1.25rem] mb-8">Upload notes and we will summarize for you!</p>
@@ -224,8 +190,12 @@ export function UploadScreenContent() {
             onDragLeave={handleDragLeave}
             aria-labelledby="dropzone-label"
           >
-            <DocumentIcon className="w-12 h-12 text-storai-teal mb-6" />
-            <p id="dropzone-label" className="text-lg text-gray-600 mb-2">
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="8" fill="#F3FFFE"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M33.6 20.7769C33.6 20.3364 33.425 19.914 33.1135 19.6025L25.9974 12.4864C25.686 12.175 25.2636 12 24.8231 12H15.6458C14.9578 12 14.4001 12.5577 14.4001 13.2456V34.7544C14.4001 35.4423 14.9578 36 15.6458 36H32.3544C33.0423 36 33.6 35.4423 33.6 34.7544V20.7769ZM24.586 14.232C24.5337 14.1796 24.4442 14.2167 24.4442 14.2907V20.9032C24.4442 21.0867 24.5929 21.2354 24.7764 21.2354H31.389C31.4629 21.2354 31.5 21.146 31.4477 21.0936L24.586 14.232Z" fill="#199D94"/>
+            </svg>
+
+            <p id="dropzone-label" className="text-lg text-gray-600 mb-2 mt-4">
               Drag and drop your files here
             </p>
             <p className="text-gray-500 mb-6">
@@ -233,7 +203,7 @@ export function UploadScreenContent() {
             </p>
             <button 
               type="button" 
-              className="px-6 py-2 bg-storai-teal text-white rounded-md font-medium hover:bg-storai-teal transition-colors"
+              className="px-6 py-2 bg-storai-teal text-white rounded-md font-medium hover:bg-opacity-90 transition-colors disabled:opacity-50"
               onClick={handleButtonClick}
               disabled={directUploading}
             >
@@ -257,16 +227,18 @@ export function UploadScreenContent() {
                 {files.map((file, index) => (
                   <li key={index} className="flex justify-between items-center p-3 bg-white rounded-md mb-2 border border-gray-200">
                     <div className="flex flex-col flex-grow min-w-0 mr-4">
-                      <span className="text-sm text-gray-800 truncate">{file.name}</span>
+                      <span className="text-sm text-gray-800 truncate" title={file.name}>{file.name}</span>
                       <span className="text-xs text-gray-500">{formatFileSize(file.size)}</span>
                     </div>
-                    {directUploading && directUploadProgress[file.name] !== undefined ? (
+                    {directUploading && directUploadProgress[file.name] !== undefined && directUploadProgress[file.name] < 100 ? (
                       <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden w-[60px]">
                         <div 
                           className="h-full bg-storai-jade transition-all duration-300" 
                           style={{ width: `${directUploadProgress[file.name] || 0}%` }}
                         />
                       </div>
+                    ) : directUploadProgress[file.name] === 100 ? (
+                      <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                     ) : (
                       <button
                         type="button"
@@ -284,14 +256,13 @@ export function UploadScreenContent() {
             </div>
           )}
 
-          {/* Show direct upload progress when no files in state but uploading in progress */}
           {files.length === 0 && directUploading && (
             <div className="bg-storai-seafoam rounded-lg p-6 mb-8">
               <h2 className="text-lg font-medium text-gray-800 mb-4">Uploading files</h2>
               <div className="h-2 bg-gray-100 rounded-full overflow-hidden mb-2">
                 <div 
                   className="h-full bg-storai-jade transition-all duration-300" 
-                  style={{ width: `${Object.values(directUploadProgress)[0] || 0}%` }}
+                  style={{ width: `${Math.round(Object.values(directUploadProgress).reduce((a, b) => a + b, 0) / Object.keys(directUploadProgress).length) || 0}%` }}
                 />
               </div>
               <p className="text-sm text-gray-600">Please wait while we upload your files...</p>
@@ -303,67 +274,12 @@ export function UploadScreenContent() {
               {directUploadError}
             </div>
           )}
-
-          <div className="flex flex-col gap-4 mb-6">
-            <h3 className="text-[1.25rem] text-[var(--color-storai-dark-blue)]"> Additional Information</h3>
-            <ul className="list-disc text-[1.125rem] text-[var(--color-storai-gray)] pl-5">
-              <li> You can easily delete your uploaded files after.</li>
-              <li>Patient identification will be anonymized.</li>
-            </ul>
-          </div>
-
-          <div className="mb-8">
-            <ArrowButton 
-              text="Data Storage Policy" 
-              onClick={toggleDataPolicy} 
-              className="mb-2 text-[0.875rem] max-w-[20rem]"
-            />
-            
-            {showPolicy && (
-              <div className="mt-4 p-4 bg-gray-50 rounded-md text-gray-700 text-sm animate-fadeIn">
-                <p className="mb-2">Your files are securely stored and automatically deleted after processing:</p>
-                <ul className="list-disc pl-5 space-y-1">
-                  <li>Files are encrypted during transit and at rest</li>
-                  <li>Files are deleted within 24 hours after processing</li>
-                  <li>No patient identifying information is stored long-term</li>
-                  <li>We comply with all applicable data protection regulations</li>
-                </ul>
-              </div>
-            )}
-          </div>
-          
-          {/* Only show this button when we have files to upload */}
-          {files.length > 0 && (
-            <button 
-              type="submit" 
-              className="w-full mt-3 bg-storai-jade text-white rounded-md py-2 px-4 flex items-center justify-center hover:bg-storai-teal transition-colors"
-              disabled={directUploading}
-            >
-              {directUploading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Uploading...
-                </>
-              ) : (
-                <>
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  Upload
-                </>
-              )}
-            </button>
-          )}
         </form>
         
-        {/* Skip button positioned in the bottom right */}
         <div className="absolute bottom-8 right-8">
           <button 
             type="button" 
-            className="px-6 py-2 bg-transparent text-gray-600 border border-gray-200 rounded-md font-medium hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 bg-transparent text-gray-600 border border-gray-200 rounded-md font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
             onClick={handleSkip}
             disabled={directUploading}
           >

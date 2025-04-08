@@ -7,7 +7,7 @@
 @layer base {
   html {
     font-family: 'Inter', sans-serif;
-    font-size: 16px;
+    font-size: 12px;
     line-height: 1.3;
     font-weight: 400;
 
@@ -49,3 +49,13 @@
     @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-storai-jade;
   }
 } 
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

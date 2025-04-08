@@ -3,6 +3,7 @@ import { TemplateType } from '../../../../domain/entities/Template';
 
 interface TemplateConfirmationModalProps {
   isOpen: boolean;
+  isLoading: boolean;
   templateType: TemplateType | null;
   onCancel: () => void;
   onConfirm: () => void;
@@ -14,6 +15,7 @@ interface TemplateConfirmationModalProps {
 const TemplateConfirmationModal: React.FC<TemplateConfirmationModalProps> = memo(({ 
   isOpen, 
   templateType, 
+  isLoading,
   onCancel, 
   onConfirm 
 }) => {
@@ -124,10 +126,14 @@ const TemplateConfirmationModal: React.FC<TemplateConfirmationModalProps> = memo
             Cancel
           </button>
           <button
-            onClick={onConfirm}
+            onClick={() => {
+              onConfirm();
+              onCancel(); // Close the modal after confirming
+            }}
             className="px-6 py-2 bg-storai-teal text-white rounded-md hover:bg-teal-600 font-medium"
+            disabled={isLoading}
           >
-            Generate {templateType}
+            {isLoading ? 'Generating...' : 'Generate'} {templateType}
           </button>
         </div>
       </div>

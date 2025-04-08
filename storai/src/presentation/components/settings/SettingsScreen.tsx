@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ApiKeySettings } from './ApiKeySettings';
 
 /**
  * Main settings screen component
  */
 export const SettingsScreen: React.FC = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('api');
+  const [activeTab, setActiveTab] = useState('general');
   
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -32,12 +31,6 @@ export const SettingsScreen: React.FC = () => {
             </div>
             <nav className="py-4">
               <button
-                className={`w-full text-left px-4 py-2 ${activeTab === 'api' ? 'bg-storai-seafoam text-storai-teal font-medium' : 'text-gray-600 hover:bg-gray-100'}`}
-                onClick={() => setActiveTab('api')}
-              >
-                API Configuration
-              </button>
-              <button
                 className={`w-full text-left px-4 py-2 ${activeTab === 'general' ? 'bg-storai-seafoam text-storai-teal font-medium' : 'text-gray-600 hover:bg-gray-100'}`}
                 onClick={() => setActiveTab('general')}
               >
@@ -53,7 +46,6 @@ export const SettingsScreen: React.FC = () => {
           </div>
           
           <div className="flex-1 p-6">
-            {activeTab === 'api' && <ApiKeySettings />}
             {activeTab === 'general' && (
               <div className="bg-white rounded-md shadow-sm p-6">
                 <h2 className="text-lg font-medium text-gray-800 mb-4">General Settings</h2>

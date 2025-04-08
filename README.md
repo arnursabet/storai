@@ -1,6 +1,6 @@
 # StorAI - HIPAA-Compliant Clinical Notes Summarizer
 
-StorAI is a desktop application built with Tauri and React that helps therapists generate narrative summaries from clinical notes using local LLM processing.
+StorAI is a desktop/web application built with Tauri and React that helps therapists generate narrative summaries from clinical notes using local/external LLM processing.
 
 ## Setup and Installation
 
@@ -9,13 +9,14 @@ StorAI is a desktop application built with Tauri and React that helps therapists
 - Node.js (v18 or later)
 - Rust (for Tauri development)
 - LLM model file (optional, see the "LLM Model Setup" section below)
+- External LLM API
 
 ### Installation Steps
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/storai.git
-   cd storai
+   git clone https://github.com/arnursabet/storai.git
+   cd storai/storai
    ```
 
 2. Install dependencies:
@@ -25,7 +26,7 @@ StorAI is a desktop application built with Tauri and React that helps therapists
 
 ### Running the App
 
-#### Desktop Mode (Tauri)
+<!-- #### Desktop Mode (Tauri)
 
 To run the app in development mode:
 ```
@@ -35,18 +36,13 @@ npm run tauri dev
 To build for production:
 ```
 npm run tauri build
-```
+``` -->
 
 #### Web Mode (Browser)
 
 To run the app in web mode:
 ```
 npm run dev:web
-```
-
-To build for web:
-```
-npm run build:web
 ```
 
 ### LLM Model Setup (Optional)

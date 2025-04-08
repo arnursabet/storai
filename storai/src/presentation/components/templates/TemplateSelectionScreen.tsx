@@ -7,6 +7,7 @@ import {
   TemplateType,
   TEMPLATES,
 } from '../../../domain/entities/Template'
+import { EditorProvider, useEditorContext } from '../editor/context/EditorContext'
 
 
 // Create a UI-friendly template format that maps the domain model to the UI needs
@@ -68,20 +69,36 @@ const uiTemplates: Record<
   },
 }
 
-export const TemplateSelectionScreen: React.FC = () => {
+// Uncaught Error: useEditorContext must be used within an EditorProvider
+// at useEditorContext (EditorContext.tsx:696:11)
+// at TemplateSelectionScreen (TemplateSelectionScreen.tsx:82:36)
+
+// This is a child component of EditorProvider
+// So we need to wrap it in EditorProvider
+
+const TemplateSelectionScreen: React.FC = () => {
+  return (
+    <EditorProvider>
+      <TemplateSelectionScreenContent />
+    </EditorProvider>
+  )
+}
+
+export default TemplateSelectionScreen
+
+
+
+export const TemplateSelectionScreenContent: React.FC = () => {
   const navigate = useNavigate()
   const { uploadedFiles } = useFileUpload()
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(
-    'SOAP'
-  )
-  const [expandedTemplate, setExpandedTemplate] = useState<TemplateType | null>(
-    'SOAP'
-  )
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType | null>(null)
+  const [expandedTemplate, setExpandedTemplate] = useState<TemplateType | null>(null)
 
   const handleTemplateClick = (template: TemplateType) => {
     if (expandedTemplate === template) {
       // If already expanded, select/deselect it
       setSelectedTemplate(selectedTemplate === template ? null : template)
+      setExpandedTemplate(null)
     } else {
       // If not expanded, expand it and select it
       setExpandedTemplate(template)
@@ -91,8 +108,8 @@ export const TemplateSelectionScreen: React.FC = () => {
 
   const handleConfirm = () => {
     if (selectedTemplate) {
-      // Pass selected template via navigation state
-      navigate('/editor', { state: { selectedTemplate } })
+      // Pass selected template via navigation state ONLY
+      navigate('/editor', { state: { selectedTemplate } });
     }
   }
 
@@ -166,7 +183,7 @@ export const TemplateSelectionScreen: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-storai-sky/30 to-white py-10">
-      <div className="max-w-4xl mx-auto px-6">
+      <div className="max-w-[80rem] mx-auto px-6">
         <div className="bg-white rounded-xl shadow-md p-8">
           <h1 className="text-2xl font-semibold text-gray-800 mb-2">
             Use template?
@@ -195,32 +212,28 @@ export const TemplateSelectionScreen: React.FC = () => {
                     key={file.id}
                     className="flex items-center justify-between py-2 px-3 border-b border-gray-100"
                   >
-                    <div className="flex items-center">
-                      <DocumentIcon className="w-5 h-5 text-blue-500 mr-3" />
+                    <div className="flex items-center gap-2">
+                       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="32" height="32" rx="5.33333" fill="#F6FAFF"/>
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M22.4 13.8515C22.4 13.5579 22.2833 13.2762 22.0757 13.0686L17.3314 8.32429C17.1237 8.11665 16.8421 8 16.5485 8H10.4305C9.97188 8 9.6001 8.37178 9.6001 8.8304V23.1696C9.6001 23.6282 9.97188 24 10.4305 24H21.5696C22.0282 24 22.4 23.6282 22.4 23.1696V13.8515ZM16.3907 9.48774C16.3559 9.45286 16.2962 9.47756 16.2962 9.52688V13.9353C16.2962 14.0576 16.3954 14.1567 16.5177 14.1567H20.926C20.9754 14.1567 21.0001 14.0971 20.9652 14.0622L16.3907 9.48774Z" fill="#2388FF"/>
+                        </svg>
+
                       <span className="text-gray-700">{file.name}</span>
                     </div>
                     <div className="flex items-center">
                       <span className="text-gray-500 text-sm mr-4">
                         {formatFileSize(file.size)}
                       </span>
-                      <button className="text-gray-400">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                            clip-rule="evenodd"
-                          />
-                          <path
-                            fillRule="evenodd"
-                            d="M12 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1z"
-                            clip-rule="evenodd"
-                          />
+                      <button className="text-gray-400" title="Remove file">
+                        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M7.00001 2.06057C6.81288 2.06057 6.63341 1.98623 6.50109 1.85391C6.36877 1.72159 6.29443 1.54212 6.29443 1.35499C6.29443 1.16786 6.36877 0.988394 6.50109 0.856073C6.63341 0.723751 6.81288 0.649414 7.00001 0.649414" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M7 2.06057C7.18713 2.06057 7.3666 1.98623 7.49892 1.85391C7.63124 1.72159 7.70558 1.54212 7.70558 1.35499C7.70558 1.16786 7.63124 0.988394 7.49892 0.856073C7.3666 0.723751 7.18713 0.649414 7 0.649414" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M7.00001 13.3506C6.81288 13.3506 6.63341 13.2763 6.50109 13.1439C6.36877 13.0116 6.29443 12.8322 6.29443 12.645C6.29443 12.4579 6.36877 12.2784 6.50109 12.1461C6.63341 12.0138 6.81288 11.9395 7.00001 11.9395" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M7 13.3506C7.18713 13.3506 7.3666 13.2763 7.49892 13.1439C7.63124 13.0116 7.70558 12.8322 7.70558 12.645C7.70558 12.4579 7.63124 12.2784 7.49892 12.1461C7.3666 12.0138 7.18713 11.9395 7 11.9395" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M7.00001 7.7051C6.81288 7.7051 6.63341 7.63076 6.50109 7.49844C6.36877 7.36612 6.29443 7.18665 6.29443 6.99952C6.29443 6.81239 6.36877 6.63293 6.50109 6.5006C6.63341 6.36828 6.81288 6.29395 7.00001 6.29395" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+                          <path d="M7 7.7051C7.18713 7.7051 7.3666 7.63076 7.49892 7.49844C7.63124 7.36612 7.70558 7.18665 7.70558 6.99952C7.70558 6.81239 7.63124 6.63293 7.49892 6.5006C7.3666 6.36828 7.18713 6.29395 7 6.29395" stroke="#666F8D" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
+
                       </button>
                     </div>
                   </li>
@@ -241,7 +254,7 @@ export const TemplateSelectionScreen: React.FC = () => {
               type="button"
               onClick={handleConfirm}
               disabled={!selectedTemplate}
-              className="px-6 py-2 bg-storai-jade text-white rounded-md hover:bg-storai-teal transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-storai-teal text-white rounded-md hover:bg-storai-teal transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
               Confirm
             </button>
@@ -251,5 +264,3 @@ export const TemplateSelectionScreen: React.FC = () => {
     </div>
   )
 }
-
-export default TemplateSelectionScreen
