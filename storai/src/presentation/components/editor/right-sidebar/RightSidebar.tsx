@@ -3,6 +3,7 @@ import StorAI_Logo from '../../../../assets/logo.png';
 import UploadsSection from './components/UploadsSection';
 import TemplatesSection from './components/TemplatesSection';
 import ArrowButton from '../../common/ArrowButton';
+import { useNavigate } from 'react-router-dom';
 
 interface RightSidebarProps {
   // Toggle UI states
@@ -33,6 +34,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
   directUploadError,
   uploadedFiles,
 }) => {
+  const navigate = useNavigate();
   return (
     <div className="w-[23%] bg-white flex flex-col ml-3 mr-3 shadow-lg mt-3 mb-3 border border-gray-100 rounded-[10px]">
       
@@ -72,6 +74,7 @@ const RightSidebar: React.FC<RightSidebarProps> = ({
         <div className="p-8 flex flex-col gap-6">
           <ArrowButton
             text="FAQ"
+            onClick={() => navigate('/faq')}
           />
             
           <ArrowButton
