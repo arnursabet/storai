@@ -181,7 +181,7 @@ export function UploadScreenContent() {
         <h1 className="text-[1.875rem] text-[var(--color-storai-dark-blue)] mb-2">Upload files</h1>
         <p className="text-[var(--color-storai-gray)] text-[1.25rem] mb-8">Upload notes and we will summarize for you!</p>
 
-        <form onSubmit={handleSubmit} className="mb-8">
+        <form onSubmit={handleSubmit} className="mb-12">
           <div 
             className={`border-2 border-dashed rounded-lg p-12 mb-8 flex flex-col items-center justify-center text-center transition-all duration-200 bg-gray-50
               ${dragActive ? 'border-storai-jade bg-storai-seafoam' : 'border-gray-200 hover:border-storai-teal'}`}
